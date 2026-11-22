@@ -1,0 +1,322 @@
+/* ==========================================================================
+   ST-NPC-Book - Modal & UI Styles
+   ========================================================================== */
+
+.npc-book-modal-root {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    text-align: left;
+    color: var(--SmartThemeBodyColor, #eee);
+}
+
+.npc-book-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #444);
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.npc-book-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.2rem;
+}
+
+.npc-book-status-pill {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--black30a, rgba(0, 0, 0, 0.3));
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+}
+
+/* Tabs */
+.npc-book-tabs {
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, #444);
+    padding-bottom: 6px;
+}
+
+.npc-book-tab-btn {
+    flex: 1;
+    padding: 7px 12px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: var(--black30a, rgba(0, 0, 0, 0.25));
+    color: var(--SmartThemeBodyColor, #ccc);
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.npc-book-tab-btn:hover {
+    background: var(--white20a, rgba(255, 255, 255, 0.1));
+}
+
+.npc-book-tab-btn.active {
+    background: var(--SmartThemeQuoteColor, #4a76a8);
+    color: #fff;
+    border-color: var(--SmartThemeBorderColor, #888);
+}
+
+.npc-book-tab-panel {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 68vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.npc-book-tab-panel.active {
+    display: flex;
+}
+
+/* Sections & Grid */
+.npc-book-section {
+    background: var(--black30a, rgba(0, 0, 0, 0.25));
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.npc-book-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 2px 0;
+    color: var(--SmartThemeQuoteColor, #8ab4f8);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.npc-book-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+}
+
+.npc-book-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px 14px;
+}
+
+@media (max-width: 640px) {
+    .npc-book-grid-2,
+    .npc-book-grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.npc-book-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.npc-book-field label {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.npc-book-field small {
+    font-size: 0.75rem;
+    opacity: 0.75;
+}
+
+.npc-book-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+}
+
+.npc-book-inline-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.npc-book-inline-row > select,
+.npc-book-inline-row > input {
+    flex: 1;
+    min-width: 0;
+}
+
+.popup .npc-book-inline-row > .menu_button {
+    width: auto !important;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 6px 14px;
+    margin: 0;
+}
+
+/* State Bar & Rollback Action Toolbar */
+.npc-book-state-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--black30a, rgba(0, 0, 0, 0.35));
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    font-size: 0.85rem;
+}
+
+.npc-book-state-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.npc-book-state-label {
+    opacity: 0.8;
+}
+
+.npc-book-action-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.npc-book-span-full {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+    .npc-book-action-toolbar {
+        grid-template-columns: 1fr;
+    }
+}
+
+.popup .npc-book-action-toolbar > .menu_button {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: center;
+    padding: 7px 12px;
+    margin: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.popup .npc-book-action-toolbar > .menu_button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.popup .npc-book-action-toolbar > .menu_button.npc-book-stop-btn {
+    border-color: rgba(240, 165, 50, 0.75);
+    color: #ffd27d;
+    background: rgba(180, 110, 20, 0.25);
+}
+
+.popup .npc-book-action-toolbar > .menu_button.npc-book-danger-btn {
+    border-color: rgba(220, 70, 70, 0.55);
+    color: #ff9b9b;
+}
+
+.popup .npc-book-action-toolbar > .menu_button.npc-book-danger-btn:hover {
+    background: rgba(200, 45, 45, 0.3);
+}
+
+.npc-book-textarea {
+    width: 100%;
+    min-height: 115px;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.35;
+}
+
+/* Missing Lorebook Popup - Beat ST's `.popup .menu_button { width: min-content }` */
+.npc-book-missing-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    width: 100%;
+}
+
+.npc-book-missing-option {
+    background: var(--black30a, rgba(0, 0, 0, 0.25));
+    border: 1px solid var(--SmartThemeBorderColor, #444);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.popup .npc-book-missing-option > .menu_button.npc-book-full-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: center;
+    padding: 8px 14px;
+    margin: 2px 0 0 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Two-column split for General section: Left (40%) for toggles, Right (60%) for Lorebook controls */
+.npc-book-general-split {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 18px;
+    align-items: start;
+}
+
+.npc-book-col-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Force full-width single-line button for "+ Neu erstellen" and popup buttons */
+.npc-book-modal-root .npc-book-full-btn,
+.npc-book-missing-popup .npc-book-full-btn {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    margin-top: 6px;
+    padding: 6px 12px;
+}
+
+@media (max-width: 650px) {
+    .npc-book-general-split {
+        grid-template-columns: 1fr;
+    }
+}

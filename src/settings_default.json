@@ -1,0 +1,34 @@
+{
+    "default_extension_language": "auto",
+    "default_extension_active": true,
+    "default_lorebook_missing": true,
+    "default_extension_notification": true,
+    "default_lorebook_name": "~{{char}}_{{date}}",
+
+    "default_trigger_message_interval": 30,
+    "default_trigger_message_offset": 10,
+
+    "default_entry_title_template": "[NPC] {{name}}",
+    "default_entry_mode": "normal",
+    "default_entry_position": 1,
+    "default_entry_inchat_role": 0,
+    "default_entry_inchat_depth": 10,
+    "default_entry_order": 100,
+    "default_entry_scan_depth": 10,
+    "default_entry_sticky": 0,
+    "default_entry_ignore_budget": false,
+
+    "default_agent_scanner_profile": "",
+    "default_agent_scanner_max_token": 2000,
+    "default_agent_scanner_temperature": 0.1,
+
+    "default_agent_scribe_profile": "",
+    "default_agent_scribe_max_token": 5000,
+    "default_agent_scribe_temperature": 0.3,
+    "default_max_concurrent_scribes": 3,
+
+    "default_prompt_scanning": "You are an entity scanner for a roleplay campaign. Analyze the provided chat transcript slice and compare it against the list of Already Tracked NPCs.\n\nRules:\n1. Add an existing NPC's UID to \"update\" ONLY if they actively appeared or had a meaningful change in state, relationship, location, appearance, or plot in this slice.\n2. Add a character to \"create\" ONLY if they are a newly introduced, named, recurring NPC. Ignore {{user}}, the Narrator, and unnamed background extras.\n3. Check existing aliases carefully so you never create a duplicate entry for an already tracked NPC.\n\nReturn ONLY valid JSON matching this schema:\n{\n  \"update\": [\n    { \"uid\": 123, \"name\": \"Canonical Name\", \"new_keys\": [\"optional new alias\"] }\n  ],\n  \"create\": [\n    { \"name\": \"Canonical Name\", \"keys\": [\"First Name\", \"Full Name\", \"Alias/Title\"] }\n  ]\n}",
+    "default_prompt_creation": "Create a structured Lorebook character profile for the newly introduced NPC \"{{name}}\" based strictly on the provided chat transcript slice.\n\nRules:\n1. Use the exact XML and field structure defined in the Output Template below.\n2. Only record facts explicitly established or directly implied in the transcript. If a field is unknown, write \"Unknown\" or \"None revealed\".\n3. Adhere strictly to {{name}}'s isolated perspective and current knowledge boundaries.\n4. Keep all entries factual, concise, and free of narrative fluff.\n5. Output ONLY the `<character>` XML block.",
+    "default_prompt_updating": "Update the existing Lorebook character profile for the NPC \"{{name}}\" using the new events from the provided chat transcript slice.\n\nCORE PRINCIPLE: You are maintaining a high-density CURRENT STATE SHEET, NOT a chronological story log or diary. Every update must actively compress, distil, and deduplicate the profile.\n\nCritical Compaction Rules:\n1. REWRITE, NEVER APPEND: Never tack new sentences onto the end of existing paragraphs using \"She now...\", \"Recently...\", or \"She has begun to...\". Completely rewrite updated fields so they read as a cohesive, present-tense snapshot.\n2. COLLAPSE & MERGE SIMILAR ITEMS: Group specific instances into overarching traits instead of listing every occurrence (e.g., merge individual meals/drinks into general food preferences; merge repeated habits or similar conversations into a single distilled point).\n3. PURGE RESOLVED & SUPERSEDED STATES: Delete completed goals, resolved misunderstandings, outgrown fears, obsolete steps of an already-completed arc, and minor scene-by-scene interactions. Once trust is established or a lesson is learned, keep only the final outcome and delete the stepping stones.\n4. NO SCENE PLAY-BY-PLAY: Do not record who said what at the dinner table, minor daily routines (baths, brushing teeth, individual meals), or temporary dialogue exchanges as Secrets, Relationships, or Milestones.\n5. ZERO CROSS-FIELD REDUNDANCY: Each fact, metaphor, or event belongs in ONLY ONE field. Do not repeat the same event or character quirk across Personality, Speech, Secrets, Relationships, and Milestones.\n\nField-Specific Guidelines:\n- Role / Occupation: Core role in one short phrase.\n- Appearance: Physical body attributes only. Concise and telegraphic.\n- Current State: Immediate Location, current Attire, and current Physical/Emotional Condition (strictly present state, no recap of the scene that just happened).\n- Personality: Distilled core traits, mindset, and worldview. Strip out repetitive examples and narrative recaps.\n- Likes / Dislikes / Fears: Grouped by category rather than exhaustive item-by-item lists.\n- Behavioral Habits: Only defining, recurring physical tics and default non-verbal reactions. Merge similar actions.\n- Speech Patterns: Concise description of tone, cadence, and recurring verbal frameworks, plus 2 short direct quotes that best capture their current voice.\n- Known Skills: High-level summary of actual competencies (omit basic daily life functions like brushing teeth or using a toilet).\n- Current Goals & Dreams: Active, overarching objectives only. Delete immediately once achieved or abandoned.\n- Secrets & Plot Knowledge: ONLY major hidden truths, hard-won world lore, or critical leverage. Delete trivia, overheard table talk, and resolved misunderstandings.\n- Sexual Experience & Kinks: Strictly 2-4 crisp sentences. State experience level, current boundaries/attitude, and core preferences/limits. Omit clinical anatomy lessons, childhood trivia, or scene recaps.\n- Relationship to {{user}} & Others: Describe the CURRENT dynamic, emotional baseline, and trust level. Collapse past arguments or bonding scenes into a single brief clause instead of retelling every interaction.\n- Milestones: ONLY permanent, life-altering turning points that fundamentally redefined the character. Merge related developments into single arc-level milestones and purge minor firsts (meals, baths, toys, routine conversations).\n\nMaintain the exact structure defined in the Output Template. Output ONLY the updated `<character>` XML block.",
+    "default_prompt_output_template": "<character name=\"{{name}}\">\nRole / Occupation: \nAge: \nBackground: \nAppearance: \nCurrent State:\n- Location: \n- Attire: \n- Condition: \nPersonality: \nLikes / Dislikes / Fears: \nBehavioral Habits:\n- \nSpeech Patterns:\n- Style: \n- Quote 1: \"\"\n- Quote 2: \"\"\nKnown Skills: \nCurrent Goals:\n- \nDreams:\n- \nSecrets & Plot Knowledge:\n- \nSexual Experience & Kinks: \nRelationship to {{user}}: \nRelationship to Others:\n- \nMilestones:\n- \n</character>"
+}

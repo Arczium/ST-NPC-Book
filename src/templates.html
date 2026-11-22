@@ -1,0 +1,319 @@
+<!-- ==========================================================================
+     1. Main 3-Tab Settings & Control Modal
+     ========================================================================== -->
+<template id="npc-book-modal-template">
+    <div class="npc-book-modal-root">
+        <div class="npc-book-header">
+            <h3>
+                <i class="fa-solid fa-address-book"></i>
+                <span>ST-NPC-Book</span>
+            </h3>
+            <div id="npc_book_status_pill" class="npc-book-status-pill" data-i18n="modal.status_loading">Loading status...</div>
+        </div>
+
+        <div class="npc-book-tabs">
+            <button type="button" class="npc-book-tab-btn active" data-tab="npc_book_tab_schedule">
+                <i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="modal.tab_schedule">Schedule &amp; Lorebook</span>
+            </button>
+            <button type="button" class="npc-book-tab-btn" data-tab="npc_book_tab_agents">
+                <i class="fa-solid fa-microchip"></i> <span data-i18n="modal.tab_agents">LLM Agents</span>
+            </button>
+            <button type="button" class="npc-book-tab-btn" data-tab="npc_book_tab_prompts">
+                <i class="fa-solid fa-file-lines"></i> <span data-i18n="modal.tab_prompts">Prompts &amp; Template</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: Schedule, Lorebook Binding & World Info Entry Defaults -->
+        <div id="npc_book_tab_schedule" class="npc-book-tab-panel active">
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_general">General &amp; Active Chat Lorebook</span>
+                </div>
+
+                <!-- 2-Column Split: Left (Language + 3 Checkboxes) | Right (Active Lorebook + Button, then Name Format) -->
+                <div class="npc-book-general-split">
+                    <!-- LEFT COLUMN -->
+                    <div class="npc-book-col-stack">
+                        <div class="npc-book-field">
+                            <label data-i18n="modal.ui_language">Interface Language</label>
+                            <select id="npc_book_language_select" class="text_pole" data-setting="extension_language"></select>
+                        </div>
+
+                        <label class="npc-book-checkbox-row">
+                            <input type="checkbox" data-setting="extension_active" />
+                            <span data-i18n="modal.enable_auto_scan">Enable Automatic NPC Scanning</span>
+                        </label>
+
+                        <label class="npc-book-checkbox-row">
+                            <input type="checkbox" data-setting="extension_notification" />
+                            <span data-i18n="modal.show_notifications">Show Toast Notifications</span>
+                        </label>
+
+                        <label class="npc-book-checkbox-row">
+                            <input type="checkbox" data-setting="lorebook_missing" />
+                            <span data-i18n="modal.prompt_missing_lorebook">Prompt When Chat Has No Lorebook</span>
+                        </label>
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="npc-book-col-stack">
+                        <div class="npc-book-field">
+                            <label data-i18n="modal.bound_lorebook">Bound Chat Lorebook</label>
+                            <select id="npc_book_bound_lorebook" class="text_pole"></select>
+                            <button type="button" id="npc_book_create_lorebook_btn" class="menu_button interactable npc-book-full-btn">
+                                <i class="fa-solid fa-plus"></i> <span data-i18n="modal.create_and_bind_btn">Create &amp; Bind New</span>
+                            </button>
+                        </div>
+
+                        <div class="npc-book-field">
+                            <label data-i18n="modal.lorebook_name_format">Auto-Created Lorebook Name Format</label>
+                            <input type="text" class="text_pole" data-setting="lorebook_name" placeholder="~{{char}}_{{date}}" />
+                            <small data-i18n-html="modal.lorebook_name_hint">Supports <code>{{char}}</code> and <code>{{date}}</code>.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_schedule">Scan Schedule &amp; Rollback Controls</span>
+                </div>
+                <div class="npc-book-grid-2">
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.slice_interval">Message Slice Interval</label>
+                        <input type="number" class="text_pole" min="1" max="500" data-setting="trigger_message_interval" />
+                        <small data-i18n="modal.slice_interval_hint">Number of messages processed per scan slice.</small>
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.buffer_offset">Buffer Offset Before Triggering</label>
+                        <input type="number" class="text_pole" min="0" max="200" data-setting="trigger_message_offset" />
+                        <small data-i18n="modal.buffer_offset_hint">Wait this many extra messages past the slice end before scanning.</small>
+                    </div>
+                </div>
+
+                <div class="npc-book-state-bar">
+                    <div class="npc-book-state-item">
+                        <span class="npc-book-state-label" data-i18n="modal.cursor_label">Last Scanned Message Cursor:</span>
+                        <strong id="npc_book_cursor_display">0</strong>
+                    </div>
+                    <div class="npc-book-state-item">
+                        <span class="npc-book-state-label" data-i18n="modal.snapshot_label">Last Slice Snapshot:</span>
+                        <span id="npc_book_snapshot_display" data-i18n="modal.snapshot_none">None available</span>
+                    </div>
+                </div>
+
+                <div class="npc-book-action-toolbar">
+                    <button type="button" id="npc_book_scan_now_btn" class="menu_button interactable">
+                        <i class="fa-solid fa-bolt"></i> <span data-i18n="modal.btn_scan_now">Scan Eligible Slice Now</span>
+                    </button>
+                    <button type="button" id="npc_book_catchup_btn" class="menu_button interactable">
+                        <i class="fa-solid fa-forward-fast"></i> <span data-i18n="modal.btn_catchup_done">Catch Up All Slices</span>
+                    </button>
+                    <button type="button" id="npc_book_undo_btn" class="menu_button interactable" disabled>
+                        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="modal.btn_undo">Undo Last Slice</span>
+                    </button>
+                    <button type="button" id="npc_book_reroll_btn" class="menu_button interactable" disabled>
+                        <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="modal.btn_reroll">Reroll Last Slice</span>
+                    </button>
+                    <button type="button" id="npc_book_wipe_btn" class="menu_button interactable npc-book-danger-btn npc-book-span-full">
+                        <i class="fa-solid fa-trash-can"></i> <span data-i18n="modal.btn_wipe">Wipe NPCs &amp; Reset to 0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_wi_defaults">World Info Entry Defaults</span>
+                </div>
+                <div class="npc-book-grid-3">
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.entry_title_tpl">Entry Title Template</label>
+                        <input type="text" class="text_pole" data-setting="entry_title_template" placeholder="[NPC] {{name}}" />
+                        <small data-i18n-html="modal.entry_title_hint">Identifies managed NPC entries via <code>{{name}}</code>.</small>
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.activation_strategy">Activation Strategy</label>
+                        <select class="text_pole" data-setting="entry_mode">
+                            <option value="normal" data-i18n="modal.mode_normal">Normal (Keyword-Triggered)</option>
+                            <option value="constant" data-i18n="modal.mode_constant">Constant (Always Active)</option>
+                            <option value="vectorized" data-i18n="modal.mode_vectorized">Vectorized (RAG)</option>
+                        </select>
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.insertion_position">Insertion Position</label>
+                        <select class="text_pole" data-setting="entry_position" data-type="number">
+                            <option value="0" data-i18n="modal.pos_before">Worldinfo before</option>
+                            <option value="1" data-i18n="modal.pos_after">Worldinfo after</option>
+                            <option value="2" data-i18n="modal.pos_an_before">Before Author's Note</option>
+                            <option value="3" data-i18n="modal.pos_an_after">After Author's Note</option>
+                            <option value="4" data-i18n="modal.pos_inchat">In-Chat @ Depth</option>
+                            <option value="5" data-i18n="modal.pos_sys_top">Top of System Prompt</option>
+                            <option value="6" data-i18n="modal.pos_sys_bottom">Bottom of System Prompt</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="npc_book_inchat_row" class="npc-book-grid-2" style="display: none;">
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.inchat_depth">In-Chat Depth</label>
+                        <input type="number" class="text_pole" min="0" max="999" data-setting="entry_inchat_depth" />
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.inchat_role">In-Chat Role</label>
+                        <select class="text_pole" data-setting="entry_inchat_role" data-type="number">
+                            <option value="0" data-i18n="modal.role_system">System</option>
+                            <option value="1" data-i18n="modal.role_user">User</option>
+                            <option value="2" data-i18n="modal.role_assistant">Assistant</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="npc-book-grid-3">
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.insertion_order">Insertion Order</label>
+                        <input type="number" class="text_pole" min="0" max="9999" data-setting="entry_order" />
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.scan_depth">Scan Depth</label>
+                        <input type="number" class="text_pole" min="0" max="100" data-setting="entry_scan_depth" />
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.sticky_duration">Sticky Duration (Turns)</label>
+                        <input type="number" class="text_pole" min="0" max="100" data-setting="entry_sticky" />
+                    </div>
+                </div>
+
+                <label class="npc-book-checkbox-row">
+                    <input type="checkbox" data-setting="entry_ignore_budget" />
+                    <span data-i18n="modal.ignore_budget">Ignore World Info Token Budget</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- TAB 2: LLM Agents (Scanner & Concurrent Scribe Workers) -->
+        <div id="npc_book_tab_agents" class="npc-book-tab-panel">
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_scanner_agent">Stage 1: Scanner Agent (JSON Roster Detection)</span>
+                </div>
+                <div class="npc-book-grid-3">
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.connection_profile">Connection Profile</label>
+                        <select class="text_pole" data-setting="agent_scanner_profile"></select>
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.max_tokens">Max Response Tokens</label>
+                        <input type="number" class="text_pole" min="128" max="16384" data-setting="agent_scanner_max_token" />
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.temperature">Temperature</label>
+                        <input type="number" class="text_pole" min="0" max="2" step="0.05" data-setting="agent_scanner_temperature" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_scribe_agent">Stage 2: Scribe Agent (Markdown Profile Creation &amp; Updates)</span>
+                </div>
+                <div class="npc-book-grid-2">
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.connection_profile">Connection Profile</label>
+                        <select class="text_pole" data-setting="agent_scribe_profile"></select>
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.max_concurrent_scribes">Max Concurrent Scribe Workers</label>
+                        <input type="number" class="text_pole" min="1" max="10" data-setting="max_concurrent_scribes" />
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.max_tokens">Max Response Tokens</label>
+                        <input type="number" class="text_pole" min="256" max="32768" data-setting="agent_scribe_max_token" />
+                    </div>
+                    <div class="npc-book-field">
+                        <label data-i18n="modal.temperature">Temperature</label>
+                        <input type="number" class="text_pole" min="0" max="2" step="0.05" data-setting="agent_scribe_temperature" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Prompts & Output Template -->
+        <div id="npc_book_tab_prompts" class="npc-book-tab-panel">
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_prompt_scanner">Stage 1: Scanner System Prompt</span>
+                    <button type="button" class="menu_button interactable npc-book-reset-prompt" data-reset-key="prompt_scanning">
+                        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="modal.btn_reset_default">Reset Default</span>
+                    </button>
+                </div>
+                <textarea class="text_pole npc-book-textarea" data-setting="prompt_scanning"></textarea>
+            </div>
+
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_prompt_creation">Stage 2: Scribe Creation System Prompt</span>
+                    <button type="button" class="menu_button interactable npc-book-reset-prompt" data-reset-key="prompt_creation">
+                        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="modal.btn_reset_default">Reset Default</span>
+                    </button>
+                </div>
+                <textarea class="text_pole npc-book-textarea" data-setting="prompt_creation"></textarea>
+            </div>
+
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_prompt_updating">Stage 2: Scribe Update System Prompt</span>
+                    <button type="button" class="menu_button interactable npc-book-reset-prompt" data-reset-key="prompt_updating">
+                        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="modal.btn_reset_default">Reset Default</span>
+                    </button>
+                </div>
+                <textarea class="text_pole npc-book-textarea" data-setting="prompt_updating"></textarea>
+            </div>
+
+            <div class="npc-book-section">
+                <div class="npc-book-section-title">
+                    <span data-i18n="modal.sec_prompt_template">NPC Profile Output Markdown Template</span>
+                    <button type="button" class="menu_button interactable npc-book-reset-prompt" data-reset-key="prompt_output_template">
+                        <i class="fa-solid fa-rotate-left"></i> <span data-i18n="modal.btn_reset_default">Reset Default</span>
+                    </button>
+                </div>
+                <textarea class="text_pole npc-book-textarea" data-setting="prompt_output_template"></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- ==========================================================================
+     2. Missing Chat Lorebook 3-Option Popup
+     ========================================================================== -->
+<template id="npc-book-missing-popup-template">
+    <div class="npc-book-missing-popup">
+        <h3><i class="fa-solid fa-book-medical"></i> <span data-i18n="popup.title">No Chat Lorebook Bound</span></h3>
+        <p data-i18n="popup.desc">This chat does not have an active Chat Lorebook bound for storing NPC profiles. How would you like to proceed?</p>
+
+        <div class="npc-book-missing-option">
+            <strong data-i18n="popup.opt1_title">Option 1: Create &amp; Bind a New Lorebook</strong>
+            <small data-i18n-html="popup.opt1_hint">Creates <code id="npc_book_popup_preview_code">ZZ_Character</code> and binds it to this chat.</small>
+            <button type="button" id="npc_book_popup_create" class="menu_button interactable npc-book-full-btn">
+                <i class="fa-solid fa-plus"></i> <span data-i18n="popup.opt1_btn">Create &amp; Bind New Lorebook</span>
+            </button>
+        </div>
+
+        <div class="npc-book-missing-option">
+            <strong data-i18n="popup.opt2_title">Option 2: Bind an Existing Lorebook</strong>
+            <select id="npc_book_popup_select" class="text_pole">
+                <option value="" data-i18n="popup.opt2_select">-- Select Existing Lorebook --</option>
+            </select>
+            <button type="button" id="npc_book_popup_bind" class="menu_button interactable npc-book-full-btn">
+                <i class="fa-solid fa-link"></i> <span data-i18n="popup.opt2_btn">Bind Selected Lorebook</span>
+            </button>
+        </div>
+
+        <div class="npc-book-missing-option">
+            <strong data-i18n="popup.opt3_title">Option 3: Ignore for This Chat</strong>
+            <small data-i18n="popup.opt3_hint">Suppresses automatic Lorebook prompts for the remainder of this chat.</small>
+            <button type="button" id="npc_book_popup_ignore" class="menu_button interactable npc-book-full-btn">
+                <i class="fa-solid fa-eye-slash"></i> <span data-i18n="popup.opt3_btn">Ignore for This Chat</span>
+            </button>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,13 @@
+{
+    "display_name": "NPC-Book",
+    "version": "1.0.0",
+    "description": "Automated SillyTavern extension that extracts and updates individual, keyword-triggered NPC Lorebook entries in batch slices.",
+    "author": "Arczium",
+    "homePage": "https://github.com/Arczium/ST-NPC-Book.git",
+    "js": "index.js",
+    "css": "style.css",
+    "loading_order": 112,
+    "auto_update": true,
+    "requires": [],
+    "optional": []
+}
